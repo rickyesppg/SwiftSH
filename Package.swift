@@ -8,25 +8,26 @@ let package = Package(
         .library(name: "SwiftSH", targets: ["SwiftSH"])
     ],
     dependencies: [
+        // 锁定到存在的预发布 tag（不含 arm64e）
         .package(url: "https://github.com/DimaRU/Libssh2Prebuild.git",
                  exact: "1.11.0-OpenSSL-1-1-1w")
     ],
     targets: [
-        // C/ObjC 目标：只能放 C 家族源码
-        .target(
-            name: "SwiftSHObjC",
-            path: "Sources/SwiftSHObjC",
-            publicHeadersPath: "include"
-        ),
-        // Swift 目标：依赖 C 目标 + CSSH
         .target(
             name: "SwiftSH",
             dependencies: [
-                "SwiftSHObjC",
                 .product(name: "CSSH", package: "Libssh2Prebuild")
             ],
-            path: "Sources/SwiftSH",
-            linkerSettings: [.linkedLibrary("z")]
+            path: "SwiftSH",
+            exclude: [
+                "SwiftSH Example", "SwiftSH Example.xcodeproj",
+                "SwiftSH.xcodeproj", "SwiftSH.xcworkspace",
+                "SwiftSH Integration Tests", ".travis", ".travis.yml",
+                "libssh2", "Dockerfile", "SwiftSH.podspec", "Frameworks"
+            ],
+            linkerSettings: [
+                .linkedLibrary("z")
+            ]
         )
     ]
 )
